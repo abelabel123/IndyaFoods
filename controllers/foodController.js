@@ -28,22 +28,72 @@ module.exports = {
             res.status(500).json({ status: false, message: "failed to get a food items" })
         }
     },
-
-    getFoodByRestaurant: async (req, res) => {
-        const restaurantId = req.params.restaurantId;
-
-        try {
-            const foods = await Food.find({ restaurant: restaurantId });
-
-            if (!foods || foods.length === 0) {
-                return res.status(404).json({ status: false, message: "No food items found" })
+    getFoodNearby: async (req, res) => {
+            const latitude = parseFloat(req.query.lat);
+            const longitude = parseFloat(req.query.lng);
+            const radius = 5000; // Radius in meters
+            const limit = 5;
+    
+            if (!latitude || !longitude) {
+                return res.status(400).json({ status: false, message: 'Latitude and longitude are required' });
             }
+        
+            try {
+                const food = await Food.aggregate([
+                    {
+                        $geoNear: {
+                            near: { type: "Point", coordinates: [longitude, latitude] },
+                            distanceField: "distance",
+                            maxDistance: radius, 
+                            spherical: true,
+                        }
+                    },
+                    {
+                        $limit: limit 
+                    }
+                ]);
+        
+                return res.status(200).json(food);
+            } catch (error) {
+                console.error("Failed to retrieve food items:", error);
+                return res.status(500).json({ message: "Server error", error });
+            }
+        },
 
-            res.status(200).json(foods)
-        } catch (error) {
-            res.status(500).json({ status: false, message: error.message })
-        }
-    },
+   getFoodsByRestaurant: async (req, res) => {
+           const restaurantId = req.params.restaurantId;
+   
+           try {
+               const foods = await Food.find({ restaurant: restaurantId });
+   
+               if (!foods || foods.length === 0) {
+                   return res.status(404).json({ status: false, message: 'No food items found for this restaurant' });
+               }
+   
+               res.status(200).json(foods);
+           } catch (error) {
+               res.status(500).json(error);
+           }
+       },
+
+       getFoodListByRestaurant: async (req, res) => {
+            
+                const restaurantId = req.params.restaurantId;
+       
+               try {
+                   const foods = await Food.find({ restaurant: restaurantId });
+       
+                   if (!foods || foods.length === 0) {
+                       return res.status(404).json({ status: false, message: 'No food items found for this restaurant' });
+                   }
+       
+                   res.status(200).json(foods);
+               } catch (error) {
+                   res.status(500).json(error);
+               }
+             },
+
+
 
     deleteFoodById: async (req, res) => {
         const foodId = req.params.id;

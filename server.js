@@ -36,6 +36,8 @@ app.use('/api/users', userRouter);
 app.use('/api/restaurant', restaurantRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/foods', foodRouter);
+console.log("✅ Food router mounted at /api/foods");
+
 app.use('/api/cart', cartRouter);
 app.use('/api/address', addressRouter);
 app.use('/api/orders', orderRouter);

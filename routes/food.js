@@ -16,9 +16,9 @@ router.delete('/:id', verifyVendor, foodController.deleteFoodById)
 
 router.patch('/:id', verifyVendor, foodController.foodAvailability)
 
-router.get('/restaurant/:restaurantId', foodController.getFoodByRestaurant)
+router.get("/restaurant/:restaurantId", foodController.getFoodsByRestaurant)
 
-router.get('/restaurant/:restaurantId', foodController.getFoodByRestaurant)
+
 
 
 
